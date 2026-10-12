@@ -1554,17 +1554,6 @@ img.img-fallback {
   color: #C0B7A1;
 }
 
-/* Demo Notice Bar */
-.demo-notice-bar {
-  background-color: var(--color-wood-brown);
-  color: #FFFFFF;
-  padding-block: 0.6rem;
-  padding-inline: 1rem;
-  text-align: center;
-  font-size: 0.8rem;
-  line-height: 1.4;
-}
-
 @media (max-width: 768px) {
   .footer-grid {
     grid-template-columns: 1fr;

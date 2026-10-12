@@ -315,13 +315,6 @@
             <p>© ${year} ${store.name[currentLang]} - ${t('rightsReserved')}</p>
           </div>
         </div>
-
-        <!-- DEMO NOTICE BAR (easy to remove upon delivery) -->
-        <div class="demo-notice-bar" role="note">
-          <div class="container">
-            ${data.DEMO_NOTICE[currentLang]}
-          </div>
-        </div>
       </footer>
     `;
   }
