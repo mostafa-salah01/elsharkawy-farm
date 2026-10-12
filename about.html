@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>من نحن | الشرقاوي للمنتجات الفلاحي</title>
+  <meta name="description" content="عن متجر الشرقاوي للمنتجات الفلاحي - طعم فلاحي أصيل يوصل لحد باب بيتك. زبدة وسمن وألبان للبيت والجملة.">
+  
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="من نحن | الشرقاوي للمنتجات الفلاحي">
+  <meta property="og:description" content="طعم فلاحي أصيل يوصل لحد باب بيتك.">
+  <meta property="og:image" content="./images/about-farm.jpg">
+  
+  <link rel="icon" type="image/png" href="./images/logo-icon.png">
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+
+  <!-- Injected Header -->
+  <div id="site-header"></div>
+
+  <main>
+    <!-- Banner -->
+    <section class="page-banner">
+      <img class="page-banner-img" src="./images/about-farm.jpg" alt="عن الشرقاوي" onerror="this.classList.add('img-fallback')">
+      <div class="page-banner-content">
+        <h1 data-i18n="aboutTitle">عن الشرقاوي للمنتجات الفلاحي</h1>
+        <p data-i18n="aboutTagline">طعم فلاحي أصيل يوصل لحد باب بيتك</p>
+      </div>
+    </section>
+
+    <!-- About Content -->
+    <section class="about-page-section">
+      <div class="container">
+        <div class="about-page-grid">
+          <div class="about-page-content">
+            <span class="badge" style="margin-block-end: 0.75rem;" data-i18n="STORE_tagline">طعم فلاحي أصيل</span>
+            <h2 style="margin-block-end: 1rem;" data-i18n="aboutTagline">طعم فلاحي أصيل يوصل لحد باب بيتك</h2>
+            <p style="font-size: 1.05rem; line-height: 1.7; color: var(--color-dark-text); margin-block-end: 1.5rem;" data-i18n="aboutStory">
+              انطلق متجر الشرقاوي لتقديم الزبدة الفلاحي والسمن البلدي والأجبان بطابعها التقليدي الأصيل. نحرص على الشفافية مع عملائنا؛ لذلك نؤكد الأوزان والأسعار وقت الطلب ونرتب التوصيل حسب منطقتك بكل مرونة ووضوح.
+            </p>
+
+            <!-- Store Details List -->
+            <div class="store-details-list">
+              <div class="store-detail-item">
+                <svg class="icon-svg icon-20" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <div>
+                  <strong data-i18n="locationLabel">مناطق الخدمة الحالية:</strong>
+                  <span id="store-location-val"></span>
+                </div>
+              </div>
+
+              <div class="store-detail-item">
+                <svg class="icon-svg icon-20" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <div>
+                  <strong data-i18n="hoursLabel">مواعيد الرد والتواصل:</strong>
+                  <span id="store-hours-val"></span>
+                </div>
+              </div>
+
+              <div class="store-detail-item">
+                <svg class="icon-svg icon-20" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                <div>
+                  <strong data-i18n="paymentMethodLabel">طريقة السداد:</strong>
+                  <span data-i18n="paymentMethodVal">الدفع عند الاستلام (كاش عند الاستلام)</span>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-block-start: 2rem;">
+              <a href="./contact.html" class="btn btn-primary" data-i18n="navContact">تواصل معنا</a>
+            </div>
+          </div>
+
+          <div class="about-page-img">
+            <img src="./images/about-farm.jpg" alt="طبيعة العمل والمنتجات" loading="lazy" onerror="this.classList.add('img-fallback')">
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Injected Footer -->
+  <div id="site-footer"></div>
+
+  <!-- Scripts -->
+  <script src="./js/data.js"></script>
+  <script src="./js/main.js"></script>
+  <script>
+    function populateAboutPage() {
+      if (!window.DATA) return;
+      const lang = window.APP ? window.APP.getLang() : 'ar';
+      const store = window.DATA.STORE;
+      const fallback = lang === 'ar' ? 'تُحدد لاحقًا' : 'To be determined';
+
+      const locElem = document.getElementById('store-location-val');
+      if (locElem) {
+        locElem.textContent = (store.governorate && store.governorate[lang]) ? store.governorate[lang] : fallback;
+      }
+
+      const hoursElem = document.getElementById('store-hours-val');
+      if (hoursElem) {
+        hoursElem.textContent = (store.workingHours && store.workingHours[lang]) ? store.workingHours[lang] : fallback;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', populateAboutPage);
+    document.addEventListener('app:languageChanged', populateAboutPage);
+  </script>
+</body>
+</html>

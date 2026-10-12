@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تفاصيل المنتج | الشرقاوي للمنتجات الفلاحي</title>
+  <meta name="description" content="تفاصيل منتج فلاحي أصيل - اطلب عبر واتساب مع تحديد الوزن والكمية والتوصيل.">
+  
+  <meta property="og:type" content="product">
+  <meta property="og:title" content="منتج من الشرقاوي للمنتجات الفلاحي">
+  <meta property="og:description" content="زبدة ومنتجات ألبان بطابع فلاحي أصيل. اطلب بسهولة عبر واتساب 01147771880 أو هاتفياً 01036262135.">
+  <meta property="og:image" content="./images/hero-main.jpg">
+  
+  <link rel="icon" type="image/png" href="./images/logo-icon.png">
+  <link rel="stylesheet" href="./css/style.css">
+
+  <!-- Dynamic Product Schema will be injected by JS -->
+  <script id="product-schema" type="application/ld+json">
+  {
+    "@context": "https://schema.org/",
+    "@type": "Product",
+    "name": "منتج فلاحي",
+    "image": "./images/hero-main.jpg",
+    "description": "منتج بطابع فلاحي أصيل"
+  }
+  </script>
+</head>
+<body>
+
+  <!-- Injected Header -->
+  <div id="site-header"></div>
+
+  <main>
+    <!-- Breadcrumb / Back Link -->
+    <div style="background-color: var(--color-ivory); border-bottom: 1px solid var(--color-border); padding-block: 0.85rem;">
+      <div class="container">
+        <a href="./products.html" style="display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.9rem; font-weight: 600; color: var(--color-dark-olive);">
+          <span>←</span>
+          <span data-i18n="navProducts">العودة لكل المنتجات</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Product Details Section -->
+    <section class="product-detail-section">
+      <div class="container">
+        <div class="product-detail-grid" id="product-detail-card">
+          <!-- Populated by JavaScript -->
+        </div>
+
+        <!-- Related Products Section -->
+        <div style="margin-block-start: 4rem;">
+          <h2 style="margin-block-end: 1.5rem;" data-i18n="relatedProducts">منتجات أخرى قد تعجبك</h2>
+          <div class="products-grid" id="related-products-grid">
+            <!-- Populated by JavaScript -->
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Injected Footer -->
+  <div id="site-footer"></div>
+
+  <!-- Scripts -->
+  <script src="./js/data.js"></script>
+  <script src="./js/main.js"></script>
+  <script>
+    let currentProduct = null;
+    let selectedWeight = '';
+    let quantity = 1;
+
+    function initProductPage() {
+      if (!window.DATA) return;
+      const params = new URLSearchParams(window.location.search);
+      const productId = params.get('id') || 'butter';
+
+      currentProduct = window.DATA.PRODUCTS.find(p => p.id === productId) || window.DATA.PRODUCTS[0];
+      const lang = window.APP ? window.APP.getLang() : 'ar';
+
+      // Pick default weight
+      const weights = currentProduct.weights[lang] || currentProduct.weights.ar;
+      selectedWeight = weights && weights.length > 0 ? weights[0] : '';
+      quantity = 1;
+
+      renderProductDetails();
+      renderRelatedProducts();
+      updatePageMeta();
+    }
+
+    function renderProductDetails() {
+      const container = document.getElementById('product-detail-card');
+      if (!container || !currentProduct || !window.DATA) return;
+
+      const lang = window.APP ? window.APP.getLang() : 'ar';
+      const name = currentProduct.name[lang] || currentProduct.name.ar;
+      const desc = currentProduct.description[lang] || currentProduct.description.ar;
+      const badge = currentProduct.badge && currentProduct.badge[lang] ? currentProduct.badge[lang] : '';
+      const priceText = currentProduct.price ? `${currentProduct.price} ج.م` : (window.DATA.STORE.priceOnDemand[lang] || 'السعر عند الطلب');
+      const weights = currentProduct.weights[lang] || currentProduct.weights.ar;
+      const store = window.DATA.STORE;
+
+      container.innerHTML = `
+        <!-- Image Box -->
+        <div class="detail-img-box">
+          <img src="${currentProduct.image}" alt="${name}" onerror="this.classList.add('img-fallback')">
+        </div>
+
+        <!-- Information & Order Controls -->
+        <div class="detail-info-box">
+          ${badge ? `<div><span class="badge">${badge}</span></div>` : ''}
+          <h1 class="detail-title">${name}</h1>
+          <div class="detail-price-line">${priceText}</div>
+          <p class="detail-desc">${desc}</p>
+
+          <!-- Weight Selection -->
+          <div class="option-group">
+            <span class="option-label">${window.APP.t('selectWeight')}</span>
+            <div class="weight-buttons">
+              ${weights.map(w => `
+                <button type="button" class="btn-weight ${w === selectedWeight ? 'active' : ''}" onclick="selectWeight('${w}')">
+                  ${w}
+                </button>
+              `).join('')}
+            </div>
+            <div class="weight-disclaimer">${store.weightDisclaimer[lang]}</div>
+          </div>
+
+          <!-- Quantity Control -->
+          <div class="option-group">
+            <span class="option-label">${window.APP.t('quantity')}</span>
+            <div class="quantity-control">
+              <button type="button" class="btn-qty" aria-label="تقليل الكمية" onclick="changeQuantity(-1)">−</button>
+              <span class="qty-val" id="qty-val">${quantity}</span>
+              <button type="button" class="btn-qty" aria-label="زيادة الكمية" onclick="changeQuantity(1)">+</button>
+            </div>
+          </div>
+
+          <!-- Delivery Area Field (Optional) -->
+          <div class="option-group">
+            <label for="delivery-area-input" class="option-label">${window.APP.t('deliveryArea')}</label>
+            <input type="text" id="delivery-area-input" class="form-input" placeholder="${window.APP.t('deliveryAreaPlaceholder')}" oninput="updateWhatsAppLink()">
+          </div>
+
+          <!-- WhatsApp Order Button -->
+          <div style="margin-block-start: 1rem;">
+            <a id="btn-whatsapp-order" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp btn-block" style="min-height: 48px; font-size: 1.05rem;">
+              ${window.APP.icons.whatsapp(22)}
+              <span data-i18n="orderWhatsApp">${window.APP.t('orderWhatsApp')}</span>
+            </a>
+          </div>
+
+          <!-- Storage Note -->
+          <div class="storage-notice-box">
+            <strong>ملاحظة هامة:</strong> ${store.storageNote[lang]}
+          </div>
+        </div>
+      `;
+
+      updateWhatsAppLink();
+    }
+
+    function selectWeight(w) {
+      selectedWeight = w;
+      document.querySelectorAll('.btn-weight').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent.trim() === w);
+      });
+      updateWhatsAppLink();
+    }
+
+    function changeQuantity(delta) {
+      quantity = Math.max(1, quantity + delta);
+      const qtyElem = document.getElementById('qty-val');
+      if (qtyElem) qtyElem.textContent = quantity;
+      updateWhatsAppLink();
+    }
+
+    function updateWhatsAppLink() {
+      const btn = document.getElementById('btn-whatsapp-order');
+      if (!btn || !currentProduct) return;
+
+      const lang = window.APP ? window.APP.getLang() : 'ar';
+      const name = currentProduct.name[lang] || currentProduct.name.ar;
+      const areaInput = document.getElementById('delivery-area-input');
+      const area = areaInput ? areaInput.value.trim() : '';
+
+      let message = '';
+      if (lang === 'ar') {
+        message = `أهلاً، عايز أطلب ${name} وزن ${selectedWeight} والكمية ${quantity}`;
+        if (area) {
+          message += `، والتوصيل إلى ${area}`;
+        }
+      } else {
+        message = `Hello, I'd like to order ${name}, weight: ${selectedWeight}, quantity: ${quantity}`;
+        if (area) {
+          message += `, delivery to ${area}`;
+        }
+      }
+
+      btn.href = window.APP.getWhatsAppUrl(message);
+    }
+
+    function renderRelatedProducts() {
+      const container = document.getElementById('related-products-grid');
+      if (!container || !window.DATA || !currentProduct) return;
+
+      const related = window.DATA.PRODUCTS
+        .filter(p => p.id !== currentProduct.id)
+        .slice(0, 3);
+
+      container.innerHTML = related.map(p => window.renderProductCard(p)).join('');
+    }
+
+    function updatePageMeta() {
+      if (!currentProduct) return;
+      const lang = window.APP ? window.APP.getLang() : 'ar';
+      const name = currentProduct.name[lang] || currentProduct.name.ar;
+      document.title = `${name} | ${window.DATA.STORE.name[lang]}`;
+
+      // Schema.org
+      const schemaScript = document.getElementById('product-schema');
+      if (schemaScript) {
+        schemaScript.textContent = JSON.stringify({
+          "@context": "https://schema.org/",
+          "@type": "Product",
+          "name": name,
+          "image": currentProduct.image,
+          "description": currentProduct.description[lang] || currentProduct.description.ar,
+          "brand": {
+            "@type": "Brand",
+            "name": window.DATA.STORE.name[lang]
+          }
+        });
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', initProductPage);
+    document.addEventListener('app:languageChanged', initProductPage);
+  </script>
+</body>
+</html>

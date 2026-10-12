@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>المنتجات | الشرقاوي للمنتجات الفلاحي</title>
+  <meta name="description" content="قائمة منتجات الشرقاوي للمنتجات الفلاحي - زبدة وسمن بلدي وأجبان فلاحي. اطلب الصنف والوزن المناسب عبر واتساب.">
+  
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="منتجات الشرقاوي للمنتجات الفلاحي">
+  <meta property="og:description" content="تصفح أصناف الزبدة والسمن والجبن الفلاحي واطلب عبر واتساب.">
+  <meta property="og:image" content="./images/hero-main.jpg">
+  
+  <link rel="icon" type="image/png" href="./images/logo-icon.png">
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+
+  <!-- Injected Header -->
+  <div id="site-header"></div>
+
+  <main>
+    <!-- Dynamic Page Banner -->
+    <section class="page-banner" id="products-banner">
+      <img id="banner-bg-img" class="page-banner-img" src="./images/cat-cheese-dairy.jpg" alt="بانر المنتجات" onerror="this.classList.add('img-fallback')">
+      <div class="page-banner-content">
+        <h1 id="banner-title" data-i18n="navProducts">المنتجات</h1>
+        <p id="banner-desc" data-i18n="categoriesSubtitle">تصفح حسب النوع المناسب لاحتياجك</p>
+      </div>
+    </section>
+
+    <!-- Products Catalog Section -->
+    <section class="products-section">
+      <div class="container">
+        <!-- Filter Tabs -->
+        <div class="filter-tabs-wrapper" id="filter-tabs-container">
+          <!-- Populated by JavaScript -->
+        </div>
+
+        <!-- Search Status / Active filter indicator -->
+        <div id="search-status-bar" style="display: none; margin-block-end: 1.5rem; font-size: 0.95rem; color: var(--color-warm-gray);"></div>
+
+        <!-- Products Grid -->
+        <div class="products-grid" id="products-catalog-grid">
+          <!-- Populated by JavaScript -->
+        </div>
+
+        <!-- No Results Box -->
+        <div id="no-results-box" style="display: none; text-align: center; padding: 4rem 1rem;">
+          <h3 style="margin-block-end: 0.5rem; color: var(--color-warm-gray);" data-i18n="searchNoResults">لا توجد منتجات مطابقة للبحث</h3>
+          <p style="margin-block-end: 1.5rem; color: var(--color-warm-gray);">جرب البحث بكلمة أخرى أو تصفح كل الأقسام.</p>
+          <button type="button" class="btn btn-secondary" onclick="window.resetProductsFilter();">عرض كل المنتجات</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Injected Footer -->
+  <div id="site-footer"></div>
+
+  <!-- Scripts -->
+  <script src="./js/data.js"></script>
+  <script src="./js/main.js"></script>
+  <script>
+    let activeCategory = 'all';
+    let searchQuery = '';
+
+    function initCatalog() {
+      if (!window.DATA) return;
+      const params = new URLSearchParams(window.location.search);
+      activeCategory = params.get('cat') || 'all';
+      searchQuery = params.get('q') || '';
+
+      renderFilterTabs();
+      applyFilters();
+    }
+
+    function renderFilterTabs() {
+      const container = document.getElementById('filter-tabs-container');
+      if (!container || !window.DATA) return;
+      const lang = window.APP ? window.APP.getLang() : 'ar';
+
+      const tabs = [
+        { id: 'all', name: lang === 'ar' ? 'الكل' : 'All' },
+        ...window.DATA.CATEGORIES.filter(c => c.id !== 'wholesale').map(c => ({
+          id: c.id,
+          name: c.name[lang]
+        }))
+      ];
+
+      container.innerHTML = tabs.map(tab => `
+        <button type="button" class="filter-tab ${tab.id === activeCategory ? 'active' : ''}" data-cat="${tab.id}" onclick="selectCategory('${tab.id}')">
+          ${tab.name}
+        </button>
+      `).join('');
+    }
+
+    function selectCategory(catId) {
+      activeCategory = catId;
+      searchQuery = ''; // clear search when tab is explicitly clicked
+      // update URL without full reload
+      const url = new URL(window.location);
+      if (catId === 'all') {
+        url.searchParams.delete('cat');
+      } else {
+        url.searchParams.set('cat', catId);
+      }
+      url.searchParams.delete('q');
+      window.history.replaceState({}, '', url);
+
+      renderFilterTabs();
+      updateBanner();
+      applyFilters();
+    }
+
+    function updateBanner() {
+      if (!window.DATA) return;
+      const lang = window.APP ? window.APP.getLang() : 'ar';
+      const bannerImg = document.getElementById('banner-bg-img');
+      const bannerTitle = document.getElementById('banner-title');
+      const bannerDesc = document.getElementById('banner-desc');
+
+      if (activeCategory === 'all') {
+        bannerImg.src = './images/cat-cheese-dairy.jpg';
+        bannerTitle.textContent = lang === 'ar' ? 'جميع المنتجات' : 'All Products';
+        bannerDesc.textContent = lang === 'ar' ? 'تصفح قائمة منتجات الفلاحي الأصيلة' : 'Browse our authentic farm selection';
+      } else {
+        const cat = window.DATA.CATEGORIES.find(c => c.id === activeCategory);
+        if (cat) {
+          bannerImg.src = cat.image;
+          bannerTitle.textContent = cat.name[lang];
+          bannerDesc.textContent = cat.description[lang];
+        }
+      }
+    }
+
+    function applyFilters() {
+      if (!window.DATA) return;
+      const lang = window.APP ? window.APP.getLang() : 'ar';
+      const grid = document.getElementById('products-catalog-grid');
+      const noResults = document.getElementById('no-results-box');
+      const statusBar = document.getElementById('search-status-bar');
+
+      let filtered = window.DATA.PRODUCTS;
+
+      if (activeCategory !== 'all') {
+        filtered = filtered.filter(p => p.categoryId === activeCategory);
+      }
+
+      if (searchQuery.trim()) {
+        const q = searchQuery.trim().toLowerCase();
+        filtered = filtered.filter(p => {
+          const nameAr = (p.name.ar || '').toLowerCase();
+          const nameEn = (p.name.en || '').toLowerCase();
+          const descAr = (p.description.ar || '').toLowerCase();
+          const descEn = (p.description.en || '').toLowerCase();
+          return nameAr.includes(q) || nameEn.includes(q) || descAr.includes(q) || descEn.includes(q);
+        });
+
+        statusBar.style.display = 'block';
+        statusBar.textContent = lang === 'ar' 
+          ? `نتائج البحث عن: "${searchQuery}" (${filtered.length})` 
+          : `Search results for: "${searchQuery}" (${filtered.length})`;
+      } else {
+        statusBar.style.display = 'none';
+      }
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '';
+        noResults.style.display = 'block';
+      } else {
+        noResults.style.display = 'none';
+        grid.innerHTML = filtered.map(p => window.renderProductCard(p)).join('');
+      }
+    }
+
+    window.filterProductsBySearch = function (q) {
+      searchQuery = q || '';
+      activeCategory = 'all';
+      renderFilterTabs();
+      updateBanner();
+      applyFilters();
+    };
+
+    window.resetProductsFilter = function () {
+      selectCategory('all');
+    };
+
+    document.addEventListener('DOMContentLoaded', initCatalog);
+    document.addEventListener('app:languageChanged', () => {
+      renderFilterTabs();
+      updateBanner();
+      applyFilters();
+    });
+  </script>
+</body>
+</html>

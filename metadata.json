@@ -1,0 +1,8 @@
+{
+  "name": "El Sharkawy Farm Products",
+  "description": "Authentic Egyptian dairy, pure farm butter, ghee, and artisan cheeses direct from the pastures to your doorstep.",
+  "requestFramePermissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
