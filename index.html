@@ -53,6 +53,32 @@
         <div class="hero-card">
           <h1 class="hero-title" data-i18n="heroTitle">الشرقاوي للمنتجات الفلاحي</h1>
           <p class="hero-subtitle" data-i18n="heroSubtitle">زبدة ومنتجات ألبان للبيت والجملة بطعم فلاحي أصيل</p>
+          
+          <!-- Dedicated Homepage Search Bar -->
+          <div class="hero-search-wrapper">
+            <form class="hero-search-form" id="hero-search-form" onsubmit="event.preventDefault(); window.handleGlobalSearch(document.getElementById('hero-search-input').value);">
+              <svg class="icon-svg icon-20 hero-search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              <input type="search" id="hero-search-input" class="hero-search-input" placeholder="ابحث عن منتجك المفضل... (زبدة، سمن، جبنة قريش...)" data-i18n-placeholder="heroSearchPlaceholder" aria-label="ابحث عن منتج" autocomplete="off">
+              <button type="submit" class="hero-search-btn" data-i18n="heroSearchBtn">بحث</button>
+            </form>
+
+            <!-- Quick Suggestions Tags -->
+            <div class="hero-search-tags">
+              <span class="hero-tag-label" data-i18n="heroSearchPopular">أكثر بحثاً:</span>
+              <button type="button" class="hero-tag-btn" onclick="window.handleGlobalSearch('زبدة')">زبدة بلدي</button>
+              <button type="button" class="hero-tag-btn" onclick="window.handleGlobalSearch('سمن')">سمن بلدي</button>
+              <button type="button" class="hero-tag-btn" onclick="window.handleGlobalSearch('قريش')">جبنة قريش</button>
+              <button type="button" class="hero-tag-btn" onclick="window.handleGlobalSearch('بيضاء')">جبنة بيضاء</button>
+              <button type="button" class="hero-tag-btn" onclick="window.handleGlobalSearch('باكدج')">باكدج البيت</button>
+            </div>
+
+            <!-- Instant Autocomplete Dropdown -->
+            <div class="hero-search-dropdown" id="hero-search-dropdown" style="display: none;"></div>
+          </div>
+
           <div class="hero-actions">
             <a href="./products.html" class="btn btn-primary" data-i18n="browseProducts">تصفح المنتجات</a>
             <a href="https://wa.me/201147771880?text=%D8%A3%D9%87%D9%84%D8%A7%D9%8B%D8%8C%20%D8%B9%D8%A7%D9%8A%D8%B2%20%D8%A3%D8%B3%D8%AA%D9%81%D8%B3%D8%B1%20%D8%B9%D9%86%20%D9%85%D9%86%D8%AA%D8%AC%D8%A7%D8%AA%20%D8%A7%D9%84%D9%81%D9%84%D8%A7%D8%AD%D9%8A%20%D8%A7%D9%84%D9%85%D8%AA%D8%A7%D8%AD%D8%A9" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp">
@@ -220,7 +246,67 @@
       }
     }
 
-    document.addEventListener('DOMContentLoaded', populateHomepage);
+    // 3. Hero Search Autocomplete & Quick Lookup
+    function setupHeroSearch() {
+      const input = document.getElementById('hero-search-input');
+      const dropdown = document.getElementById('hero-search-dropdown');
+      if (!input || !dropdown || !window.DATA) return;
+
+      input.addEventListener('input', () => {
+        const query = input.value.trim().toLowerCase();
+        if (!query) {
+          dropdown.style.display = 'none';
+          dropdown.innerHTML = '';
+          return;
+        }
+
+        const lang = window.APP ? window.APP.getLang() : 'ar';
+        const matches = window.DATA.PRODUCTS.filter(p => {
+          const nameAr = (p.name.ar || '').toLowerCase();
+          const nameEn = (p.name.en || '').toLowerCase();
+          const descAr = (p.description.ar || '').toLowerCase();
+          const descEn = (p.description.en || '').toLowerCase();
+          return nameAr.includes(query) || nameEn.includes(query) || descAr.includes(query) || descEn.includes(query);
+        });
+
+        if (matches.length === 0) {
+          const noMsg = lang === 'ar' ? `لا توجد نتائج مطابقة لـ "${input.value}"` : `No matching products for "${input.value}"`;
+          dropdown.innerHTML = `
+            <div style="padding: 1rem; text-align: center; color: var(--color-warm-gray); font-size: 0.88rem;">
+              ${noMsg}
+            </div>
+          `;
+          dropdown.style.display = 'block';
+          return;
+        }
+
+        dropdown.innerHTML = matches.map(p => {
+          const name = p.name[lang] || p.name.ar;
+          const price = p.price ? `${p.price} ج.م` : (window.DATA.STORE.priceOnDemand[lang] || 'السعر عند الطلب');
+          return `
+            <a href="./product.html?id=${p.id}" class="search-dropdown-item">
+              <img src="${p.image}" alt="${name}" class="search-dropdown-img">
+              <div class="search-dropdown-info">
+                <span class="search-dropdown-name">${name}</span>
+                <span class="search-dropdown-price">${price}</span>
+              </div>
+            </a>
+          `;
+        }).join('');
+        dropdown.style.display = 'block';
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.hero-search-wrapper')) {
+          dropdown.style.display = 'none';
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      populateHomepage();
+      setupHeroSearch();
+    });
     document.addEventListener('app:languageChanged', populateHomepage);
   </script>
 </body>
