@@ -309,10 +309,13 @@
           </div>
         </div>
 
-        <!-- Copyright -->
+        <!-- Copyright & Credit -->
         <div class="footer-bottom">
-          <div class="container">
+          <div class="container footer-bottom-inner">
             <p>© ${year} ${store.name[currentLang]} - ${t('rightsReserved')}</p>
+            <p class="footer-credit">
+              ${currentLang === 'ar' ? 'صنع بواسطة' : 'Crafted by'} <a href="https://wa.me/201205798302" target="_blank" rel="noopener noreferrer" style="color: inherit; font-weight: 700; text-decoration: underline;">Webstak</a> | <a href="tel:01205798302" dir="ltr" style="color: inherit;">01205798302</a>
+            </p>
           </div>
         </div>
       </footer>

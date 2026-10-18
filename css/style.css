@@ -1550,13 +1550,35 @@ img.img-fallback {
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   padding-block: 1.25rem;
   font-size: 0.85rem;
-  text-align: center;
   color: #C0B7A1;
+}
+
+.footer-bottom-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.footer-credit {
+  color: #D2C9B3;
+  font-size: 0.85rem;
+}
+
+.footer-credit a:hover {
+  color: #FFFFFF;
 }
 
 @media (max-width: 768px) {
   .footer-grid {
     grid-template-columns: 1fr;
     gap: 1.75rem;
+  }
+  .footer-bottom-inner {
+    flex-direction: column;
+    text-align: center;
+    justify-content: center;
+    gap: 0.5rem;
   }
 }

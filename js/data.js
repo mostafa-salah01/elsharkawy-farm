@@ -296,6 +296,7 @@ const DATA = {
       footerContact: "معلومات التواصل",
       footerPaymentNotice: "طرق الدفع: الدفع عند الاستلام (كاش)",
       rightsReserved: "جميع الحقوق محفوظة",
+      craftedBy: "صنع بواسطة Webstak | 01205798302",
       langSwitch: "EN"
     },
     en: {
@@ -364,6 +365,7 @@ const DATA = {
       footerContact: "Contact Info",
       footerPaymentNotice: "Payment: Cash on Delivery",
       rightsReserved: "All Rights Reserved",
+      craftedBy: "Crafted by Webstak | 01205798302",
       langSwitch: "ع"
     }
   }
